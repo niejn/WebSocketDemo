@@ -2,25 +2,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Java后端WebSocket的Tomcat实现</title>
+    <title>中信期货交易回报提醒</title>
 </head>
 <body>
-    Welcome<br/><input id="text" type="text"/>
+    中信期货交易回报提醒<br/><input id="text" type="text"/>
     <button onclick="send()">发送消息</button>
     <hr/>
     <button onclick="closeWebSocket()">关闭WebSocket连接</button>
     <hr/>
     <div id="message"></div>
+    <%--<video controls  name="media" autoplay="autoplay">--%>
+        <%--<source src="http://localhost:8080/mp3/test.mp3" type="audio/mp3">--%>
+    <%--</video>--%>
+    <audio id="bgMusic" hidden='true' name="media">
+        <source src="http://localhost:8080/mp3/test.mp3" type="audio/mp3">
+    </audio>
 </body>
 
 <script type="text/javascript">
+
     var websocket = null;
     //判断当前浏览器是否支持WebSocket
     if ('WebSocket' in window) {
-        websocket = new WebSocket("ws://localhost:8080/websocket");
+        websocket = new WebSocket("ws://10.21.68.43:8080/websocket");
     }
     else {
-        alert('当前浏览器 Not support websocket')
+        alert('当前浏览器 Not support websocket');
     }
 
     //连接发生错误的回调方法
@@ -36,6 +43,7 @@
     //接收到消息的回调方法
     websocket.onmessage = function (event) {
         setMessageInnerHTML(event.data);
+        // $( this ).dialog( "close" );
     }
 
     //连接关闭的回调方法
@@ -51,6 +59,12 @@
     //将消息显示在网页上
     function setMessageInnerHTML(innerHTML) {
         document.getElementById('message').innerHTML += innerHTML + '<br/>';
+        // alert(innerHTML);
+        var audio = document.getElementById("bgMusic");
+        audio.play();
+        var name=prompt("有新的订单", innerHTML)
+
+
     }
 
     //关闭WebSocket连接
