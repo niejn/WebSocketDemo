@@ -14,6 +14,7 @@ public class ClientSingleton {
     }
 
     public String get_msg(){
+
         OrderMsg my_order = my_orderMsgQueue.get_ordermsg();
         System.out.println(Thread.currentThread().getName() + " handles  " + my_order);
         return my_order.toString();
@@ -21,7 +22,8 @@ public class ClientSingleton {
     private ClientSingleton(){
         my_orderMsgQueue = new OrderMsgQueue();
          _client = new Fix_Client(my_orderMsgQueue);
-        fix_client_thread = new Thread(_client);
+//        fix_client_thread = new Thread(_client);
+        fix_client_thread = _client;
         fix_client_thread.start();
 
     };
@@ -48,6 +50,7 @@ public class ClientSingleton {
     }
     static {
         //通过静态代码块的执行,来获取实例
+        System.out.println("static ClientSingleton create");
         staticSingleton = new ClientSingleton();
     }
 

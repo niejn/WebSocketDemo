@@ -1,6 +1,7 @@
 package me.gacl.websocket;
 
 import fix_client.ClientSingleton;
+import msg.MsgSendSingleton;
 
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -24,13 +25,33 @@ public class WebSocketTest {
 
 	//与某个客户端的连接会话，需要通过它来给客户端发送数据
 	private Session session;
-	private ClientSingleton _client = null;
-	private Thread _send_msg_thread = null;
+	private static ClientSingleton _client = null;
+	// 类共有一个send_message 和 client
+	private static Thread _send_msg_thread = null;
+	private static MsgSendSingleton staticMsgSendSingleton = MsgSendSingleton.getInstance(webSocketSet);
 	/**
 	 * 连接建立成功调用的方法
 	 * @param session  可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
 	 *                 C:\Program Files\Apache Software Foundation\Tomcat 9.0\bin\1.txt
 	 */
+	/*{
+		_send_msg_thread = new Thread(() -> {
+			System.out.println("static New msg send thread ");
+			while (true){
+				String order_msg = _client.get_msg();
+				for(WebSocketTest item: webSocketSet){
+					try {
+
+						item.sendMessage(order_msg);
+					} catch (IOException e) {
+						e.printStackTrace();
+						continue;
+					}
+				}
+			}
+
+		});
+	}*/
 	@OnOpen
 	public void onOpen(Session session){
 
@@ -38,32 +59,14 @@ public class WebSocketTest {
 		webSocketSet.add(this);     //加入set中
 		addOnlineCount();           //在线数加1
 		System.out.println("New Connection, Current Clients Num: " + getOnlineCount());
+/*
 		_client = ClientSingleton.getInstance();
-		if (_send_msg_thread == null){
-			_send_msg_thread = new Thread(() -> {
-				while (true){
-					String order_msg = _client.get_msg();
-					for(WebSocketTest item: webSocketSet){
-						try {
+*/
 
-							item.sendMessage(order_msg);
-						} catch (IOException e) {
-							e.printStackTrace();
-							continue;
-						}
-					}
-					try {
-						sleep(10000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
 
-			});
 
-		}
 
-		_send_msg_thread.start();
+
 	}
 
 	/**

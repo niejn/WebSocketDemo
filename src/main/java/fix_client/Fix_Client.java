@@ -11,7 +11,8 @@ import java.util.Map;
 import static java.lang.Thread.sleep;
 import static quickfix.FixVersions.BEGINSTRING_FIX44;
 
-public class Fix_Client implements Runnable{
+//implements Runnable
+public class Fix_Client extends Thread{
     public static quickfix.SessionID sessionID = null;
     private SocketInitiator initiator = null;
     OrderMsgQueue my_orderMsgQueue = null;
@@ -139,9 +140,10 @@ public class Fix_Client implements Runnable{
 
 //        wait();
         System.out.println("================ while =============");
-        while (true){
+       /* while (true){
             sleep(1000);
-        }
+        }*/
+        System.out.println("================ fix client run end =============");
     }
 
     public void stop_initiator(){
@@ -164,8 +166,16 @@ public class Fix_Client implements Runnable{
     public void run() {
         try {
             run_fix_client();
+
+            while (!isInterrupted()){
+                sleep(1000);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+            stop_initiator();
         }
     }
 }
