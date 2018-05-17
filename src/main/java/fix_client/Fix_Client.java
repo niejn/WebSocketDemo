@@ -5,6 +5,7 @@ import quickfix.*;
 //import wx_tool.WxBot;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,12 +23,18 @@ public class Fix_Client extends Thread{
     private static SessionSettings createSettings() {
         SessionSettings settings = new SessionSettings();
         //
-        String SenderID = "ESolution1";
+//        String SenderID = "Esolution1";
 
-        String serverIP = "211.95.40.133";
+//        String serverIP = "211.95.40.133";
+//        String serverPort = "7567";
+//        String startTime = "11:45:00";
+//        String endTime = "11:20:00";
+        String SenderID = "TRAFIG01_INTRADAY";
+        String serverIP = "211.144.195.148";
         String serverPort = "7567";
         String startTime = "11:45:00";
         String endTime = "11:20:00";
+
 //        String title = "IntradayForBTG";
 
         Map defaults = new HashMap<String, String>();
@@ -39,15 +46,28 @@ public class Fix_Client extends Thread{
         defaults.put("SenderCompID", SenderID);
         defaults.put("SocketConnectHost", serverIP);
         defaults.put("SocketConnectPort ", serverPort);
-        /*{
+        {
             String path = "1.txt";
             File file = new File(path);
             System.out.println(file.getAbsolutePath());//输出读取到的文件路径
-        }*/
+        }
+//        try{
+//            String path = Fix_Client.class.getClassLoader().getResource("../lib/FIX44_Futu.xml").getPath();
+//            System.out.println(path);
+//            defaults.put("DataDictionary", path);
+//        }catch (quickfix.ConfigError e){
+//            defaults.put("DataDictionary", "FIX44_Futu.xml");
+//        }
         String path = Fix_Client.class.getClassLoader().getResource("../lib/FIX44_Futu.xml").getPath();
         System.out.println(path);
-        defaults.put("DataDictionary", path);
-//        defaults.put("DataDictionary", "FIX44_Futu.xml");
+        File fix_file = new File(path);
+        if (fix_file.exists()){
+            defaults.put("DataDictionary", path);
+        }else {
+            defaults.put("DataDictionary", "FIX44_Futu.xml");
+        }
+
+
 
         defaults.put("StartTime", startTime);
         defaults.put("EndTime", endTime);
@@ -69,8 +89,8 @@ public class Fix_Client extends Thread{
         defaults.put("EnableNextExpectedMsgSeqNum", "Y");
         settings.set(defaults);
 
-
-        quickfix.SessionID sessionID = new quickfix.SessionID(BEGINSTRING_FIX44, SenderID, "CiticNewedge", "citicsf");
+//        SessionID sessionID = new SessionID(BEGINSTRING_FIX44, SenderID, "CiticNewedge", "citicsf");
+        SessionID sessionID = new SessionID(BEGINSTRING_FIX44, SenderID, "CiticNewedge");
         settings.setString(sessionID, "SocketConnectPort", serverPort);
 
         /*

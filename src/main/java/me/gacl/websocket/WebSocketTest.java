@@ -19,7 +19,7 @@ import static java.lang.Thread.sleep;
 public class WebSocketTest {
 	//静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
 	private static int onlineCount = 0;
-
+	private boolean authorized = false;
 	//concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
 	private static CopyOnWriteArraySet<WebSocketTest> webSocketSet = new CopyOnWriteArraySet<WebSocketTest>();
 
@@ -56,7 +56,10 @@ public class WebSocketTest {
 	public void onOpen(Session session){
 
 		this.session = session;
+
 		webSocketSet.add(this);     //加入set中
+
+
 		addOnlineCount();           //在线数加1
 		System.out.println("New Connection, Current Clients Num: " + getOnlineCount());
 /*
@@ -74,7 +77,10 @@ public class WebSocketTest {
 	 */
 	@OnClose
 	public void onClose(){
+
 		webSocketSet.remove(this);  //从set中删除
+
+
 		subOnlineCount();           //在线数减1
 		System.out.println("Connection Closed, Current Clients Num: " + getOnlineCount());
 	}
@@ -90,10 +96,29 @@ public class WebSocketTest {
 		if(message.equals("shutdown")){
 			_client.stop();
 		}
+		if(message.equals("123456")){
+			String t_msg = "LOGIN SUCCESS!";
+			if(!authorized){
+				authorized = true;
+
+			}else {
+				t_msg = "ALREADY LOGIN";
+			}
+			try {
+				this.sendMessage(t_msg);
+				return;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
 		//群发消息
 		for(WebSocketTest item: webSocketSet){
 			try {
-				item.sendMessage(message);
+				if (item.authorized){
+					item.sendMessage(message);
+				}
+
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -151,5 +176,9 @@ public class WebSocketTest {
 		destroy();
 //		super.finalize();
 		System.out.println("destructor");
+	}
+
+	public boolean isAuthorized() {
+		return authorized;
 	}
 }
